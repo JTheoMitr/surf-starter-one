@@ -21,15 +21,24 @@ suspend fun main() = Korge(width = 1024, height = 768, bgcolor = Colors["#2b2b2b
 	}
 	addChild(bgField)
 
-	val image = image(resourcesVfs["placeholder_silver_surfer.png"].readBitmap()) {
+	val waypoint = image(resourcesVfs["ocean_waypoint_two.png"].readBitmap()) {
 		anchor(.5, .5)
+		scale(.5)
+		visible = false
+	}
+
+	val image = image(resourcesVfs["placeholder_silver_surfer.png"].readBitmap()) {
+		anchor(.45, .5)
 		scale(.8)
 		position(width / 2, height / 2)
 	}
 
 	bgField.onClick {
 		println("clicked!")
+
 		val target = it.currentPosLocal
+		waypoint.visible = true
+		waypoint.pos = target
 		image.tweenAsync(image::x[image.x, target.x], time = 2.seconds, easing = Easing.EASE_IN_OUT)
 		image.tweenAsync(image::y[image.y, target.y], time = 2.seconds, easing = Easing.EASE_IN_OUT)
 	}
