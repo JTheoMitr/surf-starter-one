@@ -4,6 +4,7 @@ import com.soywiz.korge.input.onClick
 import com.soywiz.korge.tween.*
 import com.soywiz.korge.view.*
 import com.soywiz.korge.view.Circle
+import com.soywiz.korim.atlas.readAtlas
 import com.soywiz.korim.color.*
 import com.soywiz.korim.format.*
 import com.soywiz.korio.file.std.*
@@ -15,21 +16,35 @@ suspend fun main() = Korge(width = 1024, height = 768, bgcolor = Colors["#2b2b2b
     val minDegrees = (-16).degrees
 	val maxDegrees = (+16).degrees
 
+	val waveSprites = resourcesVfs["wave_break_demo.xml"].readAtlas()
+	val breakAnimation = waveSprites.getSpriteAnimation("wave")
+
 	val bgField = RoundRect(width, height, 5.0, fill = Colors["#084762"]).apply {
 		x = 0.0
 		y = 0.0
 	}
+
+	val waveBreak = sprite(breakAnimation) {
+		scaledHeight = 1670.0
+		scaledWidth = 300.0
+		anchor(.5, .5)
+		visible = true
+	}
+
 	addChild(bgField)
+	addChild(waveBreak)
+
+	waveBreak.playAnimationLooped(spriteDisplayTime = 200.milliseconds)
 
 	val waypoint = image(resourcesVfs["ocean_waypoint_two.png"].readBitmap()) {
 		anchor(.5, .5)
-		scale(.5)
+		scale(.8)
 		visible = false
 	}
 
-	val image = image(resourcesVfs["placeholder_silver_surfer.png"].readBitmap()) {
+	val surfer = image(resourcesVfs["placeholder_silver_surfer.png"].readBitmap()) {
 		anchor(.45, .5)
-		scale(.8)
+		scale(1.3)
 		position(width / 2, height / 2)
 	}
 
@@ -39,13 +54,13 @@ suspend fun main() = Korge(width = 1024, height = 768, bgcolor = Colors["#2b2b2b
 		val target = it.currentPosLocal
 		waypoint.visible = true
 		waypoint.pos = target
-		image.tweenAsync(image::x[image.x, target.x], time = 2.seconds, easing = Easing.EASE_IN_OUT)
-		image.tweenAsync(image::y[image.y, target.y], time = 2.seconds, easing = Easing.EASE_IN_OUT)
+		surfer.tweenAsync(surfer::x[surfer.x, target.x], time = 2.seconds, easing = Easing.EASE_IN_OUT)
+		surfer.tweenAsync(surfer::y[surfer.y, target.y], time = 2.seconds, easing = Easing.EASE_IN_OUT)
 	}
 
 	while (true) {
-		image.tween(image::rotation[minDegrees], time = 1.seconds, easing = Easing.EASE_IN_OUT)
-		image.tween(image::rotation[maxDegrees], time = 1.seconds, easing = Easing.EASE_IN_OUT)
+		surfer.tween(surfer::rotation[minDegrees], time = 1.seconds, easing = Easing.EASE_IN_OUT)
+		surfer.tween(surfer::rotation[maxDegrees], time = 1.seconds, easing = Easing.EASE_IN_OUT)
 	}
 
     // Basic Shapes and Images:
