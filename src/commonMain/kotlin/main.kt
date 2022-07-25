@@ -52,7 +52,7 @@ suspend fun main() = Korge(width = 1024, height = 768, bgcolor = Colors["#2b2b2b
 
 	val waypoint = image(resourcesVfs["ocean_waypoint_two.png"].readBitmap()) {
 		anchor(.5, .5)
-		scale(.8)
+		scale(.6)
 		visible = false
 	}
 
