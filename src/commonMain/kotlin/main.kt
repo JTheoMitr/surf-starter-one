@@ -25,6 +25,9 @@ suspend fun main() = Korge(width = 1024, height = 768, bgcolor = Colors["#2b2b2b
 	val waveSprites = resourcesVfs["wave_break_demo.xml"].readAtlas()
 	val breakAnimation = waveSprites.getSpriteAnimation("wave")
 
+	val surferSprites = resourcesVfs["surfer_boi.xml"].readAtlas()
+	val idleAnimation = surferSprites.getSpriteAnimation("surfer")
+
 	// Establish Background Variable
 	val bgField = RoundRect(width, height, 5.0, fill = Colors["#084762"]).apply {
 		x = 0.0
@@ -53,11 +56,12 @@ suspend fun main() = Korge(width = 1024, height = 768, bgcolor = Colors["#2b2b2b
 		visible = false
 	}
 
-	val surfer = image(resourcesVfs["placeholder_silver_surfer.png"].readBitmap()) {
-		anchor(.45, .5)
-		scale(1.3)
-		position(width / 2, height / 2)
+	val surfer = sprite(idleAnimation) {
+		anchor(.5, .5)
+		scale(.9)
+		position(200.0, 300.0)
 	}
+	surfer.playAnimationLooped(spriteDisplayTime = 200.milliseconds)
 
 	val jellySchool = Array<Image>(1) {
 		image(resourcesVfs["jellyfish_1.png"].readBitmap()) {
