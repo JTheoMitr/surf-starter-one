@@ -1,29 +1,37 @@
 import com.soywiz.klock.*
 import com.soywiz.korge.*
 import com.soywiz.korge.input.onClick
+import com.soywiz.korge.time.delay
 import com.soywiz.korge.tween.*
 import com.soywiz.korge.view.*
 import com.soywiz.korge.view.Circle
+import com.soywiz.korge.view.tween.moveTo
 import com.soywiz.korim.atlas.readAtlas
 import com.soywiz.korim.color.*
 import com.soywiz.korim.format.*
 import com.soywiz.korio.file.std.*
 import com.soywiz.korma.geom.*
 import com.soywiz.korma.interpolation.*
+import kotlin.random.Random
 
 suspend fun main() = Korge(width = 1024, height = 768, bgcolor = Colors["#2b2b2b"]) {
 
+	// Some Abstract Values
+	val buffer = 40
     val minDegrees = (-16).degrees
 	val maxDegrees = (+16).degrees
 
+	// Sprite and Animation Control
 	val waveSprites = resourcesVfs["wave_break_demo.xml"].readAtlas()
 	val breakAnimation = waveSprites.getSpriteAnimation("wave")
 
+	// Establish Background Variable
 	val bgField = RoundRect(width, height, 5.0, fill = Colors["#084762"]).apply {
 		x = 0.0
 		y = 0.0
 	}
 
+	// Establish WaveBreak for Level Background
 	val waveBreak = sprite(breakAnimation) {
 		scaledHeight = 1670.0
 		scaledWidth = 300.0
@@ -31,10 +39,13 @@ suspend fun main() = Korge(width = 1024, height = 768, bgcolor = Colors["#2b2b2b
 		visible = true
 	}
 
+	// Set Stage for Components
 	addChild(bgField)
 	addChild(waveBreak)
 
 	waveBreak.playAnimationLooped(spriteDisplayTime = 200.milliseconds)
+
+	// Add Components to the Stage
 
 	val waypoint = image(resourcesVfs["ocean_waypoint_two.png"].readBitmap()) {
 		anchor(.5, .5)
@@ -48,6 +59,14 @@ suspend fun main() = Korge(width = 1024, height = 768, bgcolor = Colors["#2b2b2b
 		position(width / 2, height / 2)
 	}
 
+	val jellySchool = Array<Image>(1) {
+		image(resourcesVfs["jellyfish_1.png"].readBitmap()) {
+			anchor(.5, .5)
+			scale(.4)
+			visible = false
+		}
+	}
+
 	bgField.onClick {
 		println("clicked!")
 
@@ -56,11 +75,23 @@ suspend fun main() = Korge(width = 1024, height = 768, bgcolor = Colors["#2b2b2b
 		waypoint.pos = target
 		surfer.tweenAsync(surfer::x[surfer.x, target.x], time = 2.seconds, easing = Easing.EASE_IN_OUT)
 		surfer.tweenAsync(surfer::y[surfer.y, target.y], time = 2.seconds, easing = Easing.EASE_IN_OUT)
+
+		surfer.tween(surfer::rotation[minDegrees], time = 1.seconds, easing = Easing.EASE_IN_OUT)
+		surfer.tween(surfer::rotation[maxDegrees], time = 1.seconds, easing = Easing.EASE_IN_OUT)
 	}
 
 	while (true) {
-		surfer.tween(surfer::rotation[minDegrees], time = 1.seconds, easing = Easing.EASE_IN_OUT)
-		surfer.tween(surfer::rotation[maxDegrees], time = 1.seconds, easing = Easing.EASE_IN_OUT)
+
+
+		jellySchool.forEach {
+			if(!it.visible || it.pos.y > height) {
+				delay((Random.nextInt(1, 3)).seconds)
+				val jellyX = Random.nextInt(buffer, (width.toInt() - buffer)).toDouble()
+				it.visible = true
+				it.position(jellyX.toDouble(), -5.0)
+				it.moveTo(jellyX, height + buffer, 3.seconds, Easing.EASE_IN)
+			}
+		}
 	}
 
     // Basic Shapes and Images:
