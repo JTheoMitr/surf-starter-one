@@ -28,6 +28,9 @@ suspend fun main() = Korge(width = 1024, height = 768, bgcolor = Colors["#2b2b2b
 	val surferSprites = resourcesVfs["surfer_boi.xml"].readAtlas()
 	val idleAnimation = surferSprites.getSpriteAnimation("surfer")
 
+	val jellyOneSprites = resourcesVfs["jellyfish_one.xml"].readAtlas()
+	val jellyOneAnimation = jellyOneSprites.getSpriteAnimation("jelly")
+
 	// Establish Background Variable
 	val bgField = RoundRect(width, height, 5.0, fill = Colors["#084762"]).apply {
 		x = 0.0
@@ -63,12 +66,14 @@ suspend fun main() = Korge(width = 1024, height = 768, bgcolor = Colors["#2b2b2b
 	}
 	surfer.playAnimationLooped(spriteDisplayTime = 200.milliseconds)
 
-	val jellySchool = Array<Image>(1) {
-		image(resourcesVfs["jellyfish_1.png"].readBitmap()) {
+	val jellySchool = Array<Sprite>(1) {
+		sprite(jellyOneAnimation) {
 			anchor(.5, .5)
 			scale(.4)
 			visible = false
+			this.playAnimationLooped(spriteDisplayTime = 90.milliseconds)
 		}
+
 	}
 
 	bgField.onClick {
@@ -92,7 +97,7 @@ suspend fun main() = Korge(width = 1024, height = 768, bgcolor = Colors["#2b2b2b
 				delay((Random.nextInt(1, 3)).seconds)
 				val jellyX = Random.nextInt(buffer, (width.toInt() - buffer)).toDouble()
 				it.visible = true
-				it.position(jellyX.toDouble(), -5.0)
+				it.position(jellyX, -5.0)
 				it.moveTo(jellyX, height + buffer, 3.seconds, Easing.EASE_IN)
 			}
 		}
