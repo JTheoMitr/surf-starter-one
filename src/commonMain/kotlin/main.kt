@@ -72,9 +72,11 @@ suspend fun main() = Korge(width = 1024, height = 768, bgcolor = Colors["#2b2b2b
 			scale(.4)
 			visible = false
 			this.playAnimationLooped(spriteDisplayTime = 90.milliseconds)
+
 		}
 
 	}
+
 
 	bgField.onClick {
 		println("clicked!")
@@ -99,8 +101,15 @@ suspend fun main() = Korge(width = 1024, height = 768, bgcolor = Colors["#2b2b2b
 				it.visible = true
 				it.position(jellyX, -5.0)
 				it.moveTo(jellyX, height + buffer, 3.seconds, Easing.EASE_IN)
+
+				it.addUpdater {
+					if (surfer.collidesWith(this)) {
+						this.visible = false
+					}
+				}
 			}
 		}
+
 	}
 
     // Basic Shapes and Images:
