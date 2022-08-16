@@ -12,6 +12,8 @@ import com.soywiz.korim.format.*
 import com.soywiz.korio.file.std.*
 import com.soywiz.korma.geom.*
 import com.soywiz.korma.interpolation.*
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlin.random.Random
 
 suspend fun main() = Korge(width = 1024, height = 768, bgcolor = Colors["#2b2b2b"]) {
@@ -30,6 +32,9 @@ suspend fun main() = Korge(width = 1024, height = 768, bgcolor = Colors["#2b2b2b
 
 	val jellyOneSprites = resourcesVfs["jellyfish_one.xml"].readAtlas()
 	val jellyOneAnimation = jellyOneSprites.getSpriteAnimation("jelly")
+
+	val canOneSprites = resourcesVfs["oil_can_one.xml"].readAtlas()
+	val canOneAnimation = canOneSprites.getSpriteAnimation("img")
 
 	// Establish Background Variable
 	val bgField = RoundRect(width, height, 5.0, fill = Colors["#084762"]).apply {
@@ -59,6 +64,12 @@ suspend fun main() = Korge(width = 1024, height = 768, bgcolor = Colors["#2b2b2b
 		visible = false
 	}
 
+	val sodaCan = image(resourcesVfs["img_oil_soda_can.png"].readBitmap()) {
+		anchor(.5, .5)
+		scale(.6)
+		visible = false
+	}
+
 	val surfer = sprite(idleAnimation) {
 		anchor(.5, .5)
 		scale(.9)
@@ -74,7 +85,16 @@ suspend fun main() = Korge(width = 1024, height = 768, bgcolor = Colors["#2b2b2b
 			this.playAnimationLooped(spriteDisplayTime = 90.milliseconds)
 
 		}
+	}
 
+	val canCluster = Array<Sprite>(1) {
+		sprite(canOneAnimation) {
+			anchor(.5, .5)
+			scale(.4)
+			visible = false
+			this.playAnimationLooped(spriteDisplayTime = 90.milliseconds)
+
+		}
 	}
 
 
@@ -94,42 +114,35 @@ suspend fun main() = Korge(width = 1024, height = 768, bgcolor = Colors["#2b2b2b
 	while (true) {
 
 
-		jellySchool.forEach {
-			if(!it.visible || it.pos.y > height) {
-				delay((Random.nextInt(1, 3)).seconds)
-				val jellyX = Random.nextInt(buffer, (width.toInt() - buffer)).toDouble()
-				it.visible = true
-				it.position(jellyX, -5.0)
-				it.moveTo(jellyX, height + buffer, 3.seconds, Easing.EASE_IN)
+		awaitAll(async {
+			jellySchool.forEach {
+				if(!it.visible || it.pos.y > height) {
+					delay((Random.nextInt(1, 3)).seconds)
+					val jellyX = Random.nextInt(buffer, (width.toInt() - buffer)).toDouble()
+					it.visible = true
+					it.position(jellyX, -5.0)
+					it.moveTo(jellyX, height + buffer, 3.seconds, Easing.EASE_IN)
+				}
+			}
+		}, async {
+			canCluster.forEach {
+				if(!it.visible || it.pos.y > height) {
+					delay((Random.nextInt(1, 3)).seconds)
+					val canX = Random.nextInt(buffer, (width.toInt() - buffer)).toDouble()
+					it.visible = true
+					it.position(canX, -5.0)
+					it.moveTo(canX, height + buffer, 3.seconds, Easing.EASE_IN)
 
-				it.addUpdater {
-					if (surfer.collidesWith(this)) {
-						this.visible = false
+					it.addUpdater {
+						if (surfer.collidesWith(this)) {
+							this.visible = false
+						}
 					}
 				}
 			}
-		}
+		})
 
 	}
-
-    // Basic Shapes and Images:
-//	val circle = Circle(radius = 20.0, fill = Colors.GREEN).xy(100, 100)
-//	addChild(circle)
-	// ^^ code above does the same as:
-//	circle(radius = 20.0, fill = Colors.GREEN).xy(100, 100)  // can use this syntax with shapes and views that can be added to screen
-//
-//
-//    solidRect(width = 100.0, height = 100.0, Colors.GOLD).xy(110, 110)  // the later a view is added to it's parent, the higher it is in the drawing stack
-//
-//    val bitmap = resourcesVfs["korge.png"].readBitmap()
-//    image(bitmap).scale(.3).apply {
-//       // rotation = (+50).degrees
-//        alpha = 0.5
-//    }
-
-// Sprites and SpriteAnimations:
-
-
 
 
 
