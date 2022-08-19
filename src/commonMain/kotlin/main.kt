@@ -90,7 +90,7 @@ suspend fun main() = Korge(width = 1024, height = 768, bgcolor = Colors["#2b2b2b
 	val canCluster = Array<Sprite>(1) {
 		sprite(canOneAnimation) {
 			anchor(.5, .5)
-			scale(.4)
+			scale(.2)
 			visible = false
 			this.playAnimationLooped(spriteDisplayTime = 90.milliseconds)
 
@@ -121,7 +121,9 @@ suspend fun main() = Korge(width = 1024, height = 768, bgcolor = Colors["#2b2b2b
 					val jellyX = Random.nextInt(buffer, (width.toInt() - buffer)).toDouble()
 					it.visible = true
 					it.position(jellyX, -5.0)
-					it.moveTo(jellyX, height + buffer, 3.seconds, Easing.EASE_IN)
+					it.moveTo(jellyX + 75, 400.0, 1.seconds, Easing.EASE_IN )
+					it.moveTo(jellyX + 3, height - buffer, 1.seconds, Easing.EASE_IN)
+					it.moveTo(jellyX + 30, height + buffer, 1.seconds, Easing.EASE_IN )
 				}
 			}
 		}, async {
