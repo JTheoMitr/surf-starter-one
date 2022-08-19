@@ -36,6 +36,9 @@ suspend fun main() = Korge(width = 1024, height = 768, bgcolor = Colors["#2b2b2b
 	val canOneSprites = resourcesVfs["oil_can_one.xml"].readAtlas()
 	val canOneAnimation = canOneSprites.getSpriteAnimation("img")
 
+	val garbageBagSprites = resourcesVfs["garbage_bag_one.xml"].readAtlas()
+	val garbageBagAnimation = garbageBagSprites.getSpriteAnimation("img")
+
 	// Establish Background Variable
 	val bgField = RoundRect(width, height, 5.0, fill = Colors["#084762"]).apply {
 		x = 0.0
@@ -64,10 +67,10 @@ suspend fun main() = Korge(width = 1024, height = 768, bgcolor = Colors["#2b2b2b
 		visible = false
 	}
 
-	val sodaCan = image(resourcesVfs["img_oil_soda_can.png"].readBitmap()) {
-		anchor(.5, .5)
-		scale(.6)
-		visible = false
+	val garbageBag = image(resourcesVfs["garbage_bag_one.png"].readBitmap()) {
+		anchor(.5,.5)
+		scale(.1)
+		position(actualVirtualRight - 60, actualVirtualBottom - 60)
 	}
 
 	val surfer = sprite(idleAnimation) {
