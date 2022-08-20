@@ -30,8 +30,13 @@ suspend fun main() = Korge(width = 1024, height = 768, bgcolor = Colors["#2b2b2b
 	val surferSprites = resourcesVfs["surfer_boi.xml"].readAtlas()
 	val idleAnimation = surferSprites.getSpriteAnimation("surfer")
 
+	// PURPLE Jellyfish
 	val jellyOneSprites = resourcesVfs["jellyfish_one.xml"].readAtlas()
 	val jellyOneAnimation = jellyOneSprites.getSpriteAnimation("jelly")
+
+	// GREEN Jellyfish
+	val jellyTwoSprites = resourcesVfs["jellyfish_two.xml"].readAtlas()
+	val jellyTwoAnimation = jellyTwoSprites.getSpriteAnimation("jelly")
 
 	val canOneSprites = resourcesVfs["oil_can_one.xml"].readAtlas()
 	val canOneAnimation = canOneSprites.getSpriteAnimation("img")
@@ -82,6 +87,16 @@ suspend fun main() = Korge(width = 1024, height = 768, bgcolor = Colors["#2b2b2b
 
 	val jellySchool = Array<Sprite>(1) {
 		sprite(jellyOneAnimation) {
+			anchor(.5, .5)
+			scale(.4)
+			visible = false
+			this.playAnimationLooped(spriteDisplayTime = 90.milliseconds)
+
+		}
+	}
+
+	val greenJellySchool = Array<Sprite>(1) {
+		sprite(jellyTwoAnimation) {
 			anchor(.5, .5)
 			scale(.4)
 			visible = false
@@ -143,6 +158,18 @@ suspend fun main() = Korge(width = 1024, height = 768, bgcolor = Colors["#2b2b2b
 							this.visible = false
 						}
 					}
+				}
+			}
+		}, async {
+			greenJellySchool.forEach {
+				if (!it.visible || it.pos.y > height) {
+					delay((Random.nextInt(1, 3)).seconds)
+					val jellyX = Random.nextInt(buffer, (width.toInt() - buffer)).toDouble()
+					it.visible = true
+					it.position(jellyX, -5.0)
+					it.moveTo(jellyX - 50, 400.0, 2.seconds, Easing.EASE_IN)
+					it.moveTo(jellyX + 15, height - buffer, 1.seconds, Easing.EASE_IN)
+					it.moveTo(jellyX + 30, height + buffer, 1.seconds, Easing.EASE_IN)
 				}
 			}
 		})
