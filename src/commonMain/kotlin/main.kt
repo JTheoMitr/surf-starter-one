@@ -115,6 +115,14 @@ suspend fun main() = Korge(width = 1024, height = 768, bgcolor = Colors["#2b2b2b
 		}
 	}
 
+	// Level Functions
+
+	fun levelComplete() {
+		val gameOver = text("Level Completed") {
+			position(centerOnStage())
+		}
+	}
+
 
 	bgField.onClick {
 		println("clicked!")
@@ -130,6 +138,12 @@ suspend fun main() = Korge(width = 1024, height = 768, bgcolor = Colors["#2b2b2b
 	}
 
 	while (true) {
+
+
+		// WIN Parameters
+		if (garbageBag.scale >= .18) {
+			levelComplete()
+		}
 
 
 		awaitAll(async {
@@ -156,7 +170,8 @@ suspend fun main() = Korge(width = 1024, height = 768, bgcolor = Colors["#2b2b2b
 					it.addUpdater {
 						if (surfer.collidesWith(this)) {
 							this.visible = false
-							garbageBag.scale += .0007
+							garbageBag.scale += .0001
+							println("Garbage scale is ${garbageBag.scale}")
 						}
 					}
 				}
