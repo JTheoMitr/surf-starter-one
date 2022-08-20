@@ -156,6 +156,7 @@ suspend fun main() = Korge(width = 1024, height = 768, bgcolor = Colors["#2b2b2b
 					it.addUpdater {
 						if (surfer.collidesWith(this)) {
 							this.visible = false
+							garbageBag.scale += .0007
 						}
 					}
 				}
