@@ -72,6 +72,24 @@ suspend fun main() = Korge(width = 1024, height = 768, bgcolor = Colors["#2b2b2b
 		visible = false
 	}
 
+	val heartImgOne = image(resourcesVfs["pixel_heart_one.png"].readBitmap()) {
+		anchor(.5,.5)
+		scale(.03)
+		position(actualVirtualRight - 140, actualVirtualTop.toDouble() + 35)
+	}
+
+	val heartImgTwo = image(resourcesVfs["pixel_heart_one.png"].readBitmap()) {
+		anchor(.5,.5)
+		scale(.03)
+		position(actualVirtualRight - 100, actualVirtualTop.toDouble() + 35)
+	}
+
+	val heartImgThree = image(resourcesVfs["pixel_heart_one.png"].readBitmap()) {
+		anchor(.5,.5)
+		scale(.03)
+		position(actualVirtualRight - 60, actualVirtualTop.toDouble() + 35)
+	}
+
 	val garbageBag = image(resourcesVfs["garbage_bag_one.png"].readBitmap()) {
 		anchor(.5,.5)
 		scale(.1)
@@ -81,7 +99,7 @@ suspend fun main() = Korge(width = 1024, height = 768, bgcolor = Colors["#2b2b2b
 	val surfer = sprite(idleAnimation) {
 		anchor(.5, .5)
 		scale(.9)
-		position(200.0, 300.0)
+		position(actualVirtualRight / 2, virtualBottom - 60)
 	}
 	surfer.playAnimationLooped(spriteDisplayTime = 200.milliseconds)
 
@@ -170,7 +188,7 @@ suspend fun main() = Korge(width = 1024, height = 768, bgcolor = Colors["#2b2b2b
 					it.addUpdater {
 						if (surfer.collidesWith(this)) {
 							this.visible = false
-							garbageBag.scale += .0001
+							garbageBag.scale += .0003
 							println("Garbage scale is ${garbageBag.scale}")
 						}
 					}
