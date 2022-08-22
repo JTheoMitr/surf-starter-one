@@ -141,8 +141,14 @@ suspend fun main() = Korge(width = 1024, height = 768, bgcolor = Colors["#2b2b2b
 	// Level Functions
 
 	fun levelComplete() {
+
 		val gameOver = text("Level Completed") {
 			position(centerOnStage())
+			surfer.removeFromParent()
+			waypoint.removeFromParent()
+			jellySchool.forEach { it.removeFromParent() }
+			greenJellySchool.forEach { it.removeFromParent() }
+			canCluster.forEach { it.removeFromParent() }
 		}
 	}
 
@@ -167,6 +173,7 @@ suspend fun main() = Korge(width = 1024, height = 768, bgcolor = Colors["#2b2b2b
 		fun canSwitchHit() {
 			if (canSwitch) {
 				garbagePickUps += 1
+				garbageBag.scale += .05
 			}
 		}
 
@@ -214,7 +221,6 @@ suspend fun main() = Korge(width = 1024, height = 768, bgcolor = Colors["#2b2b2b
 					it.addUpdater {
 						if (surfer.collidesWith(this)) {
 							this.visible = false
-							garbageBag.scale += .0004
 							canSwitchHit()
 							canSwitch = false
 
