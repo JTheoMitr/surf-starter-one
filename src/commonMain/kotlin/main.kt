@@ -1,5 +1,7 @@
 import com.soywiz.klock.*
+import com.soywiz.klogger.AnsiEscape
 import com.soywiz.korge.*
+import com.soywiz.korge.animate.waitStop
 import com.soywiz.korge.input.onClick
 import com.soywiz.korge.time.delay
 import com.soywiz.korge.tween.*
@@ -22,6 +24,9 @@ suspend fun main() = Korge(width = 1024, height = 768, bgcolor = Colors["#2b2b2b
 	val buffer = 40
     val minDegrees = (-16).degrees
 	val maxDegrees = (+16).degrees
+	var jellyHits = 0
+	var garbagePickUps = 0
+	var canSwitch = true
 
 	// Sprite and Animation Control
 	val waveSprites = resourcesVfs["wave_break_demo.xml"].readAtlas()
@@ -157,10 +162,22 @@ suspend fun main() = Korge(width = 1024, height = 768, bgcolor = Colors["#2b2b2b
 
 	while (true) {
 
+		// track switch position for hit detection
+
+		fun canSwitchHit() {
+			if (canSwitch) {
+				garbagePickUps += 1
+			}
+		}
+
 
 		// WIN Parameters
-		if (garbageBag.scale >= .18) {
+		if (garbagePickUps >= 3) {
 			levelComplete()
+		}
+
+		if (jellyHits == 1) {
+			heartImgThree.visible = false
 		}
 
 
@@ -174,12 +191,21 @@ suspend fun main() = Korge(width = 1024, height = 768, bgcolor = Colors["#2b2b2b
 					it.moveTo(jellyX + 75, 400.0, 1.seconds, Easing.EASE_IN )
 					it.moveTo(jellyX + 3, height - buffer, 1.seconds, Easing.EASE_IN)
 					it.moveTo(jellyX + 30, height + buffer, 1.seconds, Easing.EASE_IN )
+
+					it.addUpdater {
+						if (surfer.collidesWith(this)) {
+							jellyHits += 1
+							println("Purple Jelly hits Surfer $jellyHits")
+						}
+					}
+
 				}
 			}
 		}, async {
 			canCluster.forEach {
 				if(!it.visible || it.pos.y > height) {
 					delay((Random.nextInt(1, 3)).seconds)
+					canSwitch = true
 					val canX = Random.nextInt(buffer, (width.toInt() - buffer)).toDouble()
 					it.visible = true
 					it.position(canX, -5.0)
@@ -188,8 +214,12 @@ suspend fun main() = Korge(width = 1024, height = 768, bgcolor = Colors["#2b2b2b
 					it.addUpdater {
 						if (surfer.collidesWith(this)) {
 							this.visible = false
-							garbageBag.scale += .0003
-							println("Garbage scale is ${garbageBag.scale}")
+							garbageBag.scale += .0004
+							canSwitchHit()
+							canSwitch = false
+
+ 							// colorDefault = AnsiEscape.Color.RED
+							println("$garbagePickUps")
 						}
 					}
 				}
@@ -204,6 +234,13 @@ suspend fun main() = Korge(width = 1024, height = 768, bgcolor = Colors["#2b2b2b
 					it.moveTo(jellyX - 50, 400.0, 2.seconds, Easing.EASE_IN)
 					it.moveTo(jellyX + 15, height - buffer, 1.seconds, Easing.EASE_IN)
 					it.moveTo(jellyX + 30, height + buffer, 1.seconds, Easing.EASE_IN)
+					it.addUpdater {
+						if (surfer.collidesWith(this)) {
+							jellyHits += 1
+							println("Green Jelly hits Surfer $jellyHits")
+						}
+					}
+
 				}
 			}
 		})
