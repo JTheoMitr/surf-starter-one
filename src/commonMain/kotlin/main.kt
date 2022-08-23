@@ -27,6 +27,8 @@ suspend fun main() = Korge(width = 1024, height = 768, bgcolor = Colors["#2b2b2b
 	var jellyHits = 0
 	var garbagePickUps = 0
 	var canSwitch = true
+	var jellySwitchPurple = true
+	var jellySwitchGreen = true
 
 	// Sprite and Animation Control
 	val waveSprites = resourcesVfs["wave_break_demo.xml"].readAtlas()
@@ -58,7 +60,7 @@ suspend fun main() = Korge(width = 1024, height = 768, bgcolor = Colors["#2b2b2b
 	// Establish WaveBreak for Level Background
 	val waveBreak = sprite(breakAnimation) {
 		scaledHeight = 1670.0
-		scaledWidth = 300.0
+		scaledWidth = 200.0
 		anchor(.5, .5)
 		visible = true
 	}
@@ -142,7 +144,19 @@ suspend fun main() = Korge(width = 1024, height = 768, bgcolor = Colors["#2b2b2b
 
 	fun levelComplete() {
 
-		val gameOver = text("Level Completed") {
+		val levelComplete = text("Level Completed") {
+			position(centerOnStage())
+			surfer.removeFromParent()
+			waypoint.removeFromParent()
+			jellySchool.forEach { it.removeFromParent() }
+			greenJellySchool.forEach { it.removeFromParent() }
+			canCluster.forEach { it.removeFromParent() }
+		}
+	}
+
+	fun gameOver() {
+
+		val gameOver = text("GAME OVER") {
 			position(centerOnStage())
 			surfer.removeFromParent()
 			waypoint.removeFromParent()
@@ -159,8 +173,8 @@ suspend fun main() = Korge(width = 1024, height = 768, bgcolor = Colors["#2b2b2b
 		val target = it.currentPosLocal
 		waypoint.visible = true
 		waypoint.pos = target
-		surfer.tweenAsync(surfer::x[surfer.x, target.x], time = 2.seconds, easing = Easing.EASE_IN_OUT)
-		surfer.tweenAsync(surfer::y[surfer.y, target.y], time = 2.seconds, easing = Easing.EASE_IN_OUT)
+		surfer.tweenAsync(surfer::x[surfer.x, target.x], time = 1.5.seconds, easing = Easing.EASE)
+		surfer.tweenAsync(surfer::y[surfer.y, target.y], time = 1.5.seconds, easing = Easing.EASE)
 
 		surfer.tween(surfer::rotation[minDegrees], time = 1.seconds, easing = Easing.EASE_IN_OUT)
 		surfer.tween(surfer::rotation[maxDegrees], time = 1.seconds, easing = Easing.EASE_IN_OUT)
@@ -175,17 +189,50 @@ suspend fun main() = Korge(width = 1024, height = 768, bgcolor = Colors["#2b2b2b
 				garbagePickUps += 1
 				garbageBag.scale += .05
 			}
+
+			// WIN Parameters
+			if (garbagePickUps >= 3) {
+				levelComplete()
+			}
+		}
+
+		fun jellySwitchGreenHit() {
+			if (jellySwitchGreen) {
+				jellyHits += 1
+			}
+			if (jellyHits == 1) {
+				heartImgThree.visible = false
+			}
+
+			if (jellyHits == 2) {
+				heartImgTwo.visible = false
+			}
+
+			if (jellyHits >= 3) {
+				heartImgOne.visible = false
+				gameOver()
+			}
+		}
+
+		fun jellySwitchPurpleHit() {
+			if (jellySwitchPurple) {
+				jellyHits += 1
+			}
+			if (jellyHits == 1) {
+				heartImgThree.visible = false
+			}
+
+			if (jellyHits == 2) {
+				heartImgTwo.visible = false
+			}
+
+			if (jellyHits >= 3) {
+				heartImgOne.visible = false
+				gameOver()
+			}
 		}
 
 
-		// WIN Parameters
-		if (garbagePickUps >= 3) {
-			levelComplete()
-		}
-
-		if (jellyHits == 1) {
-			heartImgThree.visible = false
-		}
 
 
 		awaitAll(async {
@@ -193,6 +240,7 @@ suspend fun main() = Korge(width = 1024, height = 768, bgcolor = Colors["#2b2b2b
 				if(!it.visible || it.pos.y > height) {
 					delay((Random.nextInt(1, 3)).seconds)
 					val jellyX = Random.nextInt(buffer, (width.toInt() - buffer)).toDouble()
+					jellySwitchPurple = true
 					it.visible = true
 					it.position(jellyX, -5.0)
 					it.moveTo(jellyX + 75, 400.0, 1.seconds, Easing.EASE_IN )
@@ -201,7 +249,8 @@ suspend fun main() = Korge(width = 1024, height = 768, bgcolor = Colors["#2b2b2b
 
 					it.addUpdater {
 						if (surfer.collidesWith(this)) {
-							jellyHits += 1
+							jellySwitchPurpleHit()
+							jellySwitchPurple = false
 							println("Purple Jelly hits Surfer $jellyHits")
 						}
 					}
@@ -235,6 +284,7 @@ suspend fun main() = Korge(width = 1024, height = 768, bgcolor = Colors["#2b2b2b
 				if (!it.visible || it.pos.y > height) {
 					delay((Random.nextInt(1, 3)).seconds)
 					val jellyX = Random.nextInt(buffer, (width.toInt() - buffer)).toDouble()
+					jellySwitchGreen = true
 					it.visible = true
 					it.position(jellyX, -5.0)
 					it.moveTo(jellyX - 50, 400.0, 2.seconds, Easing.EASE_IN)
@@ -242,7 +292,8 @@ suspend fun main() = Korge(width = 1024, height = 768, bgcolor = Colors["#2b2b2b
 					it.moveTo(jellyX + 30, height + buffer, 1.seconds, Easing.EASE_IN)
 					it.addUpdater {
 						if (surfer.collidesWith(this)) {
-							jellyHits += 1
+							jellySwitchGreenHit()
+							jellySwitchGreen = false
 							println("Green Jelly hits Surfer $jellyHits")
 						}
 					}
